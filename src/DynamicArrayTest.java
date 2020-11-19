@@ -71,22 +71,23 @@ class DynamicArrayTest {
     @Test
     void testRemove() {
 
-        for(int i=0;i<10_000_000;i++){
+        for(int i=0;i<10_000;i++){
             dArr.add(i);
         }
-        for(int i=0;i<10_000_000 ;i++){
+        for(int i=0;i<10_000 ;i++){
             arr.add(i);
         }
-        long dStar=System.currentTimeMillis();
-        for(int i=10_000_000-1;i>=0;i--){
-            dArr.remove(i);
+
+        StopWatch.start();
+        for(int i=10_000-1;i>=0;i--){
+            dArr.remove((Integer)i);
         }
-        System.out.println((double) System.currentTimeMillis() - dStar);
-        long star=System.currentTimeMillis();
-        for(int i=10_000_000-1;i>=0;i--){
-            arr.remove(i);
+        System.out.println(StopWatch.getElapsedTime());
+        StopWatch.start();
+        for(int i=10_000-1;i>=0;i--){
+            arr.remove((Integer)i);
         }
-        System.out.println((double) System.currentTimeMillis() - star);
+        System.out.println(StopWatch.getElapsedTime());
         Assert.assertArrayEquals(arr.toArray(),dArr.toArray());
     }
     @Test

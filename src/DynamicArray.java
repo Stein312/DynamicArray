@@ -1,7 +1,7 @@
 import java.util.*;
 import java.util.function.Consumer;
 
-public class DynamicArray<T> {
+public class DynamicArray<T> extends AbstractList<T>{
     private int size =0;
     private final int DEFAULT_SIZE=10;
     transient Object[] array;
@@ -30,7 +30,7 @@ public class DynamicArray<T> {
 
         @Override
         public T previous() {
-            checkForComodification();
+            checkForComModification();
             int i = cursor - 1;
             if (i < 0)
                 throw new NoSuchElementException();
@@ -52,10 +52,10 @@ public class DynamicArray<T> {
         }
 
         @Override
-        public void set(Object o) {
+        public void set(T o) {
             if (lastRet < 0)
                 throw new IllegalStateException();
-            checkForComodification();
+            checkForComModification();
 
             try {
                 DynamicArray.this.set(lastRet, o);
@@ -66,8 +66,8 @@ public class DynamicArray<T> {
         }
 
         @Override
-        public void add(Object o) {
-            checkForComodification();
+        public void add(T o) {
+            checkForComModification();
 
             try {
                 int i = cursor;
@@ -95,7 +95,7 @@ public class DynamicArray<T> {
 
         @Override
         public T next() {
-            checkForComodification();
+            checkForComModification();
             int i=cursor;
             if (i >= size)
                 throw new NoSuchElementException();
@@ -110,7 +110,7 @@ public class DynamicArray<T> {
         public void remove() {
             if (lastRet < 0)
                 throw new IllegalStateException();
-            checkForComodification();
+            checkForComModification();
 
             try {
                 DynamicArray.this.remove(lastRet);
@@ -136,11 +136,11 @@ public class DynamicArray<T> {
                 // update once at end to reduce heap write traffic
                 cursor = i;
                 lastRet = i - 1;
-                checkForComodification();
+                checkForComModification();
             }
         }
 
-        final void checkForComodification() {
+        final void checkForComModification() {
             if (modCount != expectedModCount)
                 throw new ConcurrentModificationException();
         }
@@ -157,13 +157,14 @@ public class DynamicArray<T> {
     public ListIterator<T> listIterator() {
         return new ListItr(0);
     }
-    public int add(Object e){
+    public boolean add(T e){
         modCount++;
         if(size == array.length) array = Arrays.copyOf(array, (int) (array.length * 1.5));
         array[size]=e;
-        return size++;
+        size++;
+        return true;
     }
-    public void add(int i,Object e){
+    public void add(int i,T e){
 
         if(i>=0 && i<= size){
             modCount++;
@@ -179,23 +180,26 @@ public class DynamicArray<T> {
             throw new IndexOutOfBoundsException("Index: "+i+", Size: "+ size);
         }
     }
-    public Object set(int i, Object e){
-        Object prev=array[i];
+    public T set(int i, T e){
+        T prev= get(i);
         array[i]=e;
         return prev;
     }
-    public void remove(int i){
+    public T remove(int i){
         final int newSize;
         Objects.checkIndex(i,size);
+        Object o=array[i];
         modCount++;
         if ((newSize = size - 1) > i)
             System.arraycopy(array, i + 1, array, i, newSize - i);
+
         array[size = newSize] = null;
+        return (T) o;
     }
-    public Object get(int i){
-        return array[i];
+    public T get(int i){
+        return (T) array[i];
     }
-    public int remove(Object o){
+    public boolean remove(Object o){
         int i = 0;
         found: {
             if (o == null) {
@@ -207,11 +211,11 @@ public class DynamicArray<T> {
                     if (o.equals(array[i]))
                         break found;
             }
-            return -1;
+            return false;
         }
 
         remove(i);
-        return i;
+        return true;
     }
     public int size(){
         return size;
@@ -242,14 +246,9 @@ public class DynamicArray<T> {
         return false;
     }
     public Object[] toArray(){
-
         return Arrays.copyOf(array,size);
     }
 
-    public static void main(String[] args) {
-        DynamicArray<Integer> darr=new DynamicArray<>();
-        darr.add(123);
-        darr.remove(100);
-    }
+
 
 }
