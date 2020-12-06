@@ -1,9 +1,9 @@
+package main.java;
+
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
 import java.util.LinkedList;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class DoublyLinkedListTest {
     DoublyLinkedList<Integer> dll=new DoublyLinkedList<>();

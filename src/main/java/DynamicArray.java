@@ -1,3 +1,5 @@
+package main.java;
+
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -145,7 +147,7 @@ public class DynamicArray<T> extends AbstractList<T>{
                 throw new ConcurrentModificationException();
         }
     }
-    /*public DynamicArray(Collection<? extends T> arr) {
+    /*public main.java.DynamicArray(Collection<? extends T> arr) {
         Object[] a=arr.toArray();
         if ((index = a.length) != 0) {
                 this.array = Arrays.copyOf(a, index, Object[].class);

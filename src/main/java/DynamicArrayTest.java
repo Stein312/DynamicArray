@@ -1,13 +1,11 @@
-import org.junit.After;
+package main.java;
+
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.jupiter.api.Test;
-import org.junit.rules.Stopwatch;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.ListIterator;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class DynamicArrayTest {
     DynamicArray<Integer> dArr=new DynamicArray<>();
@@ -61,6 +59,7 @@ class DynamicArrayTest {
         System.out.println(StopWatch.getElapsedTime());
         System.out.println(dArr.size());
         System.out.println(arr.size());
+        arr.stream().filter(num-> num%5==0);
         Assert.assertArrayEquals(arr.toArray(),dArr.toArray());
     }
 

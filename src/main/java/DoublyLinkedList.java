@@ -1,4 +1,7 @@
+package main.java;
+
 import java.util.*;
+import java.util.AbstractList;
 import java.util.function.Consumer;
 
 public class DoublyLinkedList<T> extends AbstractList<T> implements List<T>{
@@ -131,6 +134,12 @@ public class DoublyLinkedList<T> extends AbstractList<T> implements List<T>{
             this.prev = prev;
         }
     }
+
+    @Override
+    public int size() {
+        return size;
+    }
+
     public Object[] toArray() {
         Object[] result = new Object[size];
         int i = 0;
@@ -236,24 +245,7 @@ public class DoublyLinkedList<T> extends AbstractList<T> implements List<T>{
                 throw new ConcurrentModificationException();
         }
     }
-    private static class Node<T> {
-        Node<T> next;
-        T val;
 
-       public void reverse() {
-            T nextVal=val;
-            val=next.val;
-            next.val=nextVal;
-
-        }
-
-        public void swap(Node<T> n1, Node<T> n2){
-                Node<T> rev=n1.next;
-                n1.next=n2.next;
-                n2.next=n1.next;
-            }
-
-            }
 
 
 
