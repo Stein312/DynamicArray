@@ -52,11 +52,9 @@ class MySortingTest {
     @Test
     void mergeSort() {
         ArrayList<Integer> arr=new ArrayList<>();
-
-        for(int i=0;i<=50;i++) {
+        for(int i=0;i<=10;i++) {
             arr.add((int) (Math.random() * (100 - 1) + 1));
         }
-
         System.out.println(Arrays.toString(arr.toArray()));
         System.out.println();
         ArrayList<Integer> arr2= new ArrayList<>(MySorting.mergeSort(arr));

@@ -14,11 +14,9 @@ class RedBlackTreeTest {
     @Test
     void put() {
         RedBlackTree<Integer> rbt=new RedBlackTree<>();
-        for(int i=0;i<100_000;i++){
+        for(int i=0;i<100;i++){
             rbt.put(i);
         }
-        TreeMap<String,Integer> tm=new TreeMap<>();
-
         for(int i=0;i<=50;i++){
             rbt.remove(i);
         }

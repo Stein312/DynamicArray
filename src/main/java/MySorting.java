@@ -97,17 +97,14 @@ public class MySorting<E> {
             int size;
             int j=2;
             if(arr.length%2!=0){
-                if(arr.length==3) size= arr.length/2;
-                else {
                 size=arr.length/2+1;
-                }
             }
             else size= arr.length/2;
             Object[] arrNew=new Object[size];
             for(int i=0;i<= arr.length-j;i+=2){
                 arrNew[i/2]=merge((Object[]) arr[i],(Object[])arr[i+1]);
             }
-            if(arr.length==3) arrNew[0]=merge((Object[])arrNew[0],(Object[])arr[2]);
+
             if(arrNew[arrNew.length-1]==null){
                     arrNew[arrNew.length-1]=arr[arr.length-1];
             }

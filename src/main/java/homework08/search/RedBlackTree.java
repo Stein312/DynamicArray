@@ -1,44 +1,41 @@
 package main.java.homework08.search;
 
-import main.java.DoublyLinkedList;
 import main.java.homework07.code.tree.Node;
-import main.java.homework07.code.tree.binary.ArrayBinaryTree;
-import main.java.homework07.code.tree.binary.LinkedBinaryTree;
+
+import main.java.homework08.search.balanced.BalanceableTree;
 
 import java.util.*;
 
-public class RedBlackTree<E> extends LinkedBinaryTree<E> {
-    public RedBlackNode<E> getRoot() {
-        return root;
-    }
-
-    RedBlackNode<E> root;
-    private final Comparator<? super E> comparator;
-    private static final boolean RED   = false;
+public class RedBlackTree<E> extends BalanceableTree<E> {
+    protected RedBlackNode<E> root;
+    private static final boolean RED = false;
     private static final boolean BLACK = true;
-    private int size=0;
+    private final Comparator<? super E> comparator;
+    private int size = 0;
     private int modCount = 0;
 
     public RedBlackTree() {
-        this.comparator=null;
+        this.comparator = null;
     }
 
     public RedBlackTree(Comparator<? super E> comparator) {
         this.comparator = comparator;
+
     }
 
     private static <E> RedBlackNode<E> parentOf(RedBlackNode<E> p) {
-        return (p == null ? null: p.parent);
+        return (p == null ? null : (RedBlackNode<E>) p.getParent());
     }
+
     private static <E> RedBlackNode<E> leftOf(RedBlackNode<E> p) {
-        return (p == null) ? null: p.left;
+        return (p == null) ? null : (RedBlackNode<E>) p.getLeft();
     }
 
     private static <E> RedBlackNode<E> rightOf(RedBlackNode<E> p) {
-        return (p == null) ? null: p.right;
+        return (p == null) ? null : (RedBlackNode<E>) p.getRight();
     }
 
-    private static <E> boolean colorOf(RedBlackNode<E> p) {
+    public static <E> boolean colorOf(RedBlackNode<E> p) {
         return (p == null ? BLACK : p.color);
     }
 
@@ -47,44 +44,83 @@ public class RedBlackTree<E> extends LinkedBinaryTree<E> {
             p.color = c;
     }
 
-    private void rotateLeft(RedBlackNode<E> p) {
-        if (p != null) {
-            RedBlackNode<E>  r = p.right;
-            p.right = r.left;
-            if (r.left != null)
-                r.left.parent = p;
-            r.parent = p.parent;
-            if (p.parent == null)
-                root = r;
-            else if (p.parent.left == p)
-                p.parent.left = r;
-            else
-                p.parent.right = r;
-            r.left = p;
-            p.parent = r;
-        }
-    }
-    private void rotateRight(RedBlackNode<E> p) {
-        if (p != null) {
-            RedBlackNode<E> l = p.left;
-            p.left = l.right;
-            if (l.right != null) l.right.parent = p;
-            l.parent = p.parent;
-            if (p.parent == null)
-                root = l;
-            else if (p.parent.right == p)
-                p.parent.right = l;
-            else p.parent.left = l;
-            l.right = p;
-            p.parent = l;
+    static <E> RedBlackNode<E> successor(RedBlackNode<E> t) {
+        if (t == null)
+            return null;
+        else if (t.getRight() != null) {
+            RedBlackNode<E> p = (RedBlackNode<E>) t.getRight();
+            while (p.getLeft() != null)
+                p = (RedBlackNode<E>) p.getLeft();
+            return p;
+        } else {
+            RedBlackNode<E> p = (RedBlackNode<E>) t.getParent();
+            RedBlackNode<E> ch = t;
+            while (p != null && ch == p.getRight()) {
+                ch = p;
+                p = (RedBlackNode<E>) p.getParent();
+            }
+            return p;
         }
     }
 
+    static <E> RedBlackNode<E> predecessor(RedBlackNode<E> t) {
+        if (t == null)
+            return null;
+        else if (t.getLeft() != null) {
+            RedBlackNode<E> p = (RedBlackNode<E>) t.getLeft();
+            while (p.getRight() != null)
+                p = (RedBlackNode<E>) p.getRight();
+            return p;
+        } else {
+            RedBlackNode<E> p = (RedBlackNode<E>) t.getParent();
+            RedBlackNode<E> ch = t;
+            while (p != null && ch == p.getLeft()) {
+                ch = p;
+                p = (RedBlackNode<E>) p.getParent();
+            }
+
+            return p;
+        }
+    }
+
+    private void rotateLeft(RedBlackNode<E> p) {
+        if (p != null) {
+            RedBlackNode<E> r = (RedBlackNode<E>) p.getRight();
+            p.setRight(r.getLeft());
+            if (r.getLeft() != null)
+                r.getLeft().setParent(p);
+            r.setParent(p.getParent());
+            if (p.getParent() == null)
+                root = r;
+            else if (p.getParent().getLeft() == p)
+                p.getParent().setLeft(r);
+            else
+                p.getParent().setRight(r);
+            r.setLeft(p);
+            p.setParent(r);
+        }
+    }
+
+    private void rotateRight(RedBlackNode<E> p) {
+        if (p != null) {
+            RedBlackNode<E> l = (RedBlackNode<E>) p.getLeft();
+            p.setLeft(l.getRight());
+            if (l.getRight() != null) l.getRight().setParent(p);
+            l.setParent(p.getParent());
+            if (p.getParent() == null)
+                root = l;
+            else if (p.getParent().getRight() == p)
+                p.getParent().setRight(l);
+            else p.getParent().setLeft(l);
+            l.setRight(p);
+            p.setParent(l);
+        }
+    }
 
     private void fixAfterInsertion(RedBlackNode<E> x) {
         x.color = RED;
 
-        while (x != null && x != root && x.parent.color == RED) {
+        while (x != null && x != root && colorOf((RedBlackNode<E>) x.getParent()) == RED) {
             if (parentOf(x) == leftOf(parentOf(parentOf(x)))) {
                 RedBlackNode<E> y = rightOf(parentOf(parentOf(x)));
                 if (colorOf(y) == RED) {
@@ -93,13 +129,8 @@ public class RedBlackTree<E> extends LinkedBinaryTree<E> {
                     setColor(parentOf(parentOf(x)), RED);
                     x = parentOf(parentOf(x));
                 } else {
-                    if (x == rightOf(parentOf(x))) {
-                        x = parentOf(x);
-                        rotateLeft(x);
-                    }
-                    setColor(parentOf(x), BLACK);
-                    setColor(parentOf(parentOf(x)), RED);
-                    rotateRight(parentOf(parentOf(x)));
+                    rotateTwice(x);
+                    root= (RedBlackNode<E>) super.root;
                 }
             } else {
                 RedBlackNode<E> y = leftOf(parentOf(parentOf(x)));
@@ -109,22 +140,15 @@ public class RedBlackTree<E> extends LinkedBinaryTree<E> {
                     setColor(parentOf(parentOf(x)), RED);
                     x = parentOf(parentOf(x));
                 } else {
-                    if (x == leftOf(parentOf(x))) {
-                        x = parentOf(x);
-                        rotateRight(x);
-                    }
-                    setColor(parentOf(x), BLACK);
-                    setColor(parentOf(parentOf(x)), RED);
-                    rotateLeft(parentOf(parentOf(x)));
+                    rotateTwice(x);
+                    root= (RedBlackNode<E>) super.root;
                 }
             }
         }
         root.color = BLACK;
     }
-    final int compare(Object k1, Object k2) {
-        return comparator==null ? ((Comparable<? super E>)k1).compareTo((E)k2)
-                : comparator.compare((E)k1, (E)k2);
-    }
+
+
 
     private void addEntryToEmptyMap(E key) {
         compare(key, key); // type (and possibly null) check
@@ -132,7 +156,8 @@ public class RedBlackTree<E> extends LinkedBinaryTree<E> {
         size = 1;
         modCount++;
     }
-    public E put(E val){
+
+    public E put(E val) {
         RedBlackNode<E> t = root;
         if (t == null) {
             addEntryToEmptyMap(val);
@@ -145,11 +170,11 @@ public class RedBlackTree<E> extends LinkedBinaryTree<E> {
         if (cpr != null) {
             do {
                 parent = t;
-                cmp = cpr.compare(val, t.key);
+                cmp = cpr.compare(val, t.getValue());
                 if (cmp < 0)
-                    t = t.left;
+                    t = (RedBlackNode<E>) t.getLeft();
                 else if (cmp > 0)
-                    t = t.right;
+                    t = (RedBlackNode<E>) t.getRight();
             } while (t != null);
         } else {
             Objects.requireNonNull(val);
@@ -157,15 +182,15 @@ public class RedBlackTree<E> extends LinkedBinaryTree<E> {
             Comparable<? super E> k = (Comparable<? super E>) val;
             do {
                 parent = t;
-                cmp = k.compareTo(t.key);
+                cmp = k.compareTo(t.getValue());
                 if (cmp < 0)
-                    t = t.left;
+                    t = (RedBlackNode<E>) t.getLeft();
                 else if (cmp > 0)
-                    t = t.right;
+                    t = (RedBlackNode<E>) t.getRight();
                 else {
-                    E oldValue = t.key;
-                    if (false || oldValue == null) {
-                        t.key = val;
+                    E oldValue = t.getValue();
+                    if (oldValue == null) {
+                        t.setValue(val);
                     }
                     return oldValue;
                 }
@@ -174,34 +199,37 @@ public class RedBlackTree<E> extends LinkedBinaryTree<E> {
         addEntry(val, parent, cmp < 0);
         return null;
     }
+
     private void addEntry(E key, RedBlackNode<E> parent, boolean addToLeft) {
         RedBlackNode<E> e = new RedBlackNode<>(key, parent);
         if (addToLeft)
-            parent.left = e;
+            parent.setLeft(e);
         else
-            parent.right = e;
+            parent.setRight(e);
         fixAfterInsertion(e);
         size++;
         modCount++;
     }
+
     final RedBlackNode<E> getEntryUsingComparator(Object key) {
         @SuppressWarnings("unchecked")
         E k = (E) key;
         Comparator<? super E> cpr = comparator;
         if (cpr != null) {
-            RedBlackNode<E> p = root;
+            RedBlackNode<E> p = (RedBlackNode<E>) root;
             while (p != null) {
-                int cmp = cpr.compare(k, p.key);
+                int cmp = cpr.compare(k, p.getValue());
                 if (cmp < 0)
-                    p = p.left;
+                    p = (RedBlackNode<E>) p.getLeft();
                 else if (cmp > 0)
-                    p = p.right;
+                    p = (RedBlackNode<E>) p.getRight();
                 else
                     return p;
             }
         }
         return null;
     }
+
     final RedBlackNode<E> getEntry(Object key) {
         // Offload comparator-based version for sake of performance
         if (comparator != null)
@@ -209,27 +237,29 @@ public class RedBlackTree<E> extends LinkedBinaryTree<E> {
         Objects.requireNonNull(key);
         @SuppressWarnings("unchecked")
         Comparable<? super E> k = (Comparable<? super E>) key;
-        RedBlackNode<E> p = root;
+        RedBlackNode<E> p = (RedBlackNode<E>) root;
         while (p != null) {
-            int cmp = k.compareTo(p.key);
+            int cmp = k.compareTo(p.getValue());
             if (cmp < 0)
-                p = p.left;
+                p = (RedBlackNode<E>) p.getLeft();
             else if (cmp > 0)
-                p = p.right;
+                p = (RedBlackNode<E>) p.getRight();
             else
                 return p;
         }
         return null;
     }
+
     public E remove(Object key) {
         RedBlackNode<E> p = getEntry(key);
         if (p == null)
             return null;
 
-        E oldValue = p.key;
+        E oldValue = p.getValue();
         deleteEntry(p);
         return oldValue;
     }
+
     private void fixAfterDeletion(RedBlackNode<E> x) {
         while (x != root && colorOf(x) == BLACK) {
             if (x == leftOf(parentOf(x))) {
@@ -242,7 +272,7 @@ public class RedBlackTree<E> extends LinkedBinaryTree<E> {
                     sib = rightOf(parentOf(x));
                 }
 
-                if (colorOf(leftOf(sib))  == BLACK &&
+                if (colorOf(leftOf(sib)) == BLACK &&
                         colorOf(rightOf(sib)) == BLACK) {
                     setColor(sib, RED);
                     x = parentOf(x);
@@ -257,7 +287,7 @@ public class RedBlackTree<E> extends LinkedBinaryTree<E> {
                     setColor(parentOf(x), BLACK);
                     setColor(rightOf(sib), BLACK);
                     rotateLeft(parentOf(x));
-                    x = root;
+                    x = (RedBlackNode<E>) root;
                 }
             } else { // symmetric
                 RedBlackNode<E> sib = leftOf(parentOf(x));
@@ -284,73 +314,38 @@ public class RedBlackTree<E> extends LinkedBinaryTree<E> {
                     setColor(parentOf(x), BLACK);
                     setColor(leftOf(sib), BLACK);
                     rotateRight(parentOf(x));
-                    x = root;
+                    x = (RedBlackNode<E>) root;
                 }
             }
         }
 
         setColor(x, BLACK);
     }
-    static <E> RedBlackNode<E> successor(RedBlackNode<E> t) {
-        if (t == null)
-            return null;
-        else if (t.right != null) {
-            RedBlackNode<E> p = t.right;
-            while (p.left != null)
-                p = p.left;
-            return p;
-        } else {
-            RedBlackNode<E> p = t.parent;
-            RedBlackNode<E> ch = t;
-            while (p != null && ch == p.right) {
-                ch = p;
-                p = p.parent;
-            }
-            return p;
-        }
-    }
-    static <E> RedBlackNode<E> predecessor(RedBlackNode<E> t) {
-        if (t == null)
-            return null;
-        else if (t.left != null) {
-            RedBlackNode<E> p = t.left;
-            while (p.right != null)
-                p = p.right;
-            return p;
-        } else {
-            RedBlackNode<E> p = t.parent;
-            RedBlackNode<E> ch = t;
-            while (p != null && ch == p.left) {
-                ch = p;
-                p = p.parent;
-            }
-            return p;
-        }
-    }
+
     private void deleteEntry(RedBlackNode<E> p) {
         modCount++;
         size--;
 
         // If strictly internal, copy successor's element to p and then make p
         // point to successor.
-        if (p.left != null && p.right != null) {
+        if (p.getLeft() != null && p.getRight() != null) {
             RedBlackNode<E> s = successor(p);
-            p.key = s.key;
+            p.setValue(s.getValue());
             p = s;
         } // p has 2 children
 
         // Start fixup at replacement node, if it exists.
-        RedBlackNode<E> replacement = (p.left != null ? p.left : p.right);
+        RedBlackNode<E> replacement = (RedBlackNode<E>) (p.getLeft() != null ? p.getLeft() : p.getRight());
 
         if (replacement != null) {
             // Link replacement to parent
-            replacement.parent = p.parent;
-            if (p.parent == null)
+            replacement.setParent(p.getParent());
+            if (p.getParent() == null)
                 root = replacement;
-            else if (p == p.parent.left)
-                p.parent.left  = replacement;
+            else if (p == p.getParent().getLeft())
+                p.getParent().setLeft(replacement);
             else
-                p.parent.right = replacement;
+                p.getParent().setRight(replacement);
 
             // Null out links so they are OK to use by fixAfterDeletion.
             p.left = p.right = p.parent = null;
@@ -373,13 +368,15 @@ public class RedBlackTree<E> extends LinkedBinaryTree<E> {
             }
         }
     }
+
     final RedBlackNode<E> getFirstEntry() {
-        RedBlackNode<E> p = root;
+        RedBlackNode<E> p = (RedBlackNode<E>) root;
         if (p != null)
-            while (p.left != null)
-                p = p.left;
+            while (p.getLeft() != null)
+                p = (RedBlackNode<E>) p.getLeft();
         return p;
     }
+
     @Override
     public Iterator<E> iterator() {
         return new Itr(getFirstEntry());
@@ -390,7 +387,27 @@ public class RedBlackTree<E> extends LinkedBinaryTree<E> {
         return new IterableImpl();
     }
 
-    private class Itr implements Iterator<E>{
+    public static class RedBlackNode<E> extends NodeImpl<E> {
+
+
+
+
+        boolean color = BLACK;
+
+        public RedBlackNode(E key, RedBlackNode<E> parent) {
+            this.setParent(parent);
+            this.setValue(key);
+        }
+        public boolean isColor() {
+            return color;
+        }
+        public void setColor(boolean color) {
+            this.color = color;
+        }
+
+    }
+
+    private class Itr implements Iterator<E> {
         RedBlackNode<E> next;
         RedBlackNode<E> lastReturned;
         int expectedModCount;
@@ -407,7 +424,7 @@ public class RedBlackTree<E> extends LinkedBinaryTree<E> {
 
         @Override
         public E next() {
-            return nextEntry().key;
+            return nextEntry().getValue();
         }
 
         final RedBlackNode<E> nextEntry() {
@@ -438,14 +455,15 @@ public class RedBlackTree<E> extends LinkedBinaryTree<E> {
             if (modCount != expectedModCount)
                 throw new ConcurrentModificationException();
             // deleted entries are replaced by their successors
-            if (lastReturned.left != null && lastReturned.right != null)
+            if (lastReturned.getLeft() != null && lastReturned.getRight() != null)
                 next = lastReturned;
             deleteEntry(lastReturned);
             expectedModCount = modCount;
             lastReturned = null;
         }
     }
-    private class ItrNode implements Iterator<Node<E>>{
+
+    private class ItrNode implements Iterator<Node<E>> {
         RedBlackNode<E> next;
         RedBlackNode<E> lastReturned;
         int expectedModCount;
@@ -493,32 +511,20 @@ public class RedBlackTree<E> extends LinkedBinaryTree<E> {
             if (modCount != expectedModCount)
                 throw new ConcurrentModificationException();
             // deleted entries are replaced by their successors
-            if (lastReturned.left != null && lastReturned.right != null)
+            if (lastReturned.getLeft() != null && lastReturned.getRight() != null)
                 next = lastReturned;
             deleteEntry(lastReturned);
             expectedModCount = modCount;
             lastReturned = null;
         }
     }
-    private class IterableImpl implements Iterable<Node<E>>{
+
+    private class IterableImpl implements Iterable<Node<E>> {
 
         @Override
         public Iterator<Node<E>> iterator() {
             return new ItrNode(getFirstEntry());
         }
 
-    }
-
-    static class RedBlackNode<E> extends NodeImpl<E>{
-        RedBlackNode<E> parent;
-        RedBlackNode<E> left;
-        RedBlackNode<E> right;
-        E key;
-        boolean color=BLACK;
-
-        public RedBlackNode(E key,RedBlackNode<E> parent) {
-            this.parent = parent;
-            this.key=key;
-        }
     }
 }

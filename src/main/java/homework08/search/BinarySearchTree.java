@@ -30,12 +30,8 @@ public class BinarySearchTree<E> extends LinkedBinaryTree<E> {
      */
     protected int compare(E val1, E val2) {
         // todo
-        if(comparator!=null){
-        return comparator.compare(val1,val2);}
-        else {
-            Comparable<? super E> k=(Comparable<? super E>) val1;
-            return k.compareTo(val2);
-        }
+        return comparator == null ? ((Comparable<? super E>) val1).compareTo((E) val2)
+                : comparator.compare((E) val1, (E) val2);
     }
 
     /**
