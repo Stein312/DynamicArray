@@ -14,11 +14,8 @@ class RedBlackTreeTest {
     @Test
     void put() {
         RedBlackTree<Integer> rbt=new RedBlackTree<>();
-        for(int i=0;i<100;i++){
+        for(int i=0;i<10;i++){
             rbt.put(i);
-        }
-        for(int i=0;i<=50;i++){
-            rbt.remove(i);
         }
 
         Iterator<Integer> it=rbt.iterator();

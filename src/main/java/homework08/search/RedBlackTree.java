@@ -43,7 +43,19 @@ public class RedBlackTree<E> extends BalanceableTree<E> {
         if (p != null)
             p.color = c;
     }
+    public void printTree(){
+        printTree(root);
+    }
 
+    private void printTree(RedBlackNode<E> node){
+        if (node != null) {
+
+            System.out.print(" "+node.getElement());
+            printTree((RedBlackNode<E>) node.getLeft());
+            printTree((RedBlackNode<E>) node.getRight());
+        }
+
+    }
     static <E> RedBlackNode<E> successor(RedBlackNode<E> t) {
         if (t == null)
             return null;
@@ -375,6 +387,10 @@ public class RedBlackTree<E> extends BalanceableTree<E> {
             while (p.getLeft() != null)
                 p = (RedBlackNode<E>) p.getLeft();
         return p;
+    }
+    @Override
+    public Node<E> root() {
+        return root;
     }
 
     @Override
